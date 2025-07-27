@@ -1,23 +1,40 @@
+import * as yup from "yup";
 import { useState } from "react";
 import "./App.css";
+
+const loginChangeSchema = yup
+  .string()
+  .matches(
+    /^[\w_]*$/,
+    "Login must contain only letters, numbers, and underscores",
+  )
+  .max(20, "Login must be no more than 20 characters long");
+
+const loginBlurSchema = yup
+  .string()
+  .min(3, "Login must be at least 3 characters long");
+
+const validateAndGetError = (value, schema) => {
+  let errorMessage = null;
+  try {
+    schema.validateSync(value);
+  } catch ({ errors }) {
+    errorMessage = errors[0];
+  }
+  return errorMessage;
+};
 
 function App() {
   const [login, setLogin] = useState("");
   const [loginError, setLoginError] = useState(null);
   const onLoginChange = ({ target }) => {
     setLogin(target.value);
-    let error = null;
-    if (!/^[\w_]*$/.test(target.value)) {
-      error = "Login must contain only letters, numbers, and underscores";
-    } else if (target.value.length > 20) {
-      error = "Login must be no more than 20 characters long";
-    }
+    let error = validateAndGetError(target.value, loginChangeSchema);
     setLoginError(error);
   };
   const onLoginBlur = () => {
-    if (login.length < 3) {
-      setLoginError("Login must be at least 3 characters long");
-    }
+    let error = validateAndGetError(login, loginBlurSchema);
+    setLoginError(error);
   };
   const onSubmit = (event) => {
     event.preventDefault();
