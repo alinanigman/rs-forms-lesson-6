@@ -1,27 +1,48 @@
-import { useState, useRef } from "react";
+import { useForm } from "react-hook-form";
 import "./App.css";
 
 function App() {
-  const [stateCounter, setStateCounter] = useState(0);
-  const refCounter = useRef(0);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      login: "",
+    },
+  });
 
-  const incrementRefCounter = () => {
-    refCounter.current += 1;
-    console.log("refCounter = ", refCounter.current);
+  const loginProps = {
+    minLemgth: {
+      value: 3,
+      message: "Login must be at least 3 characters long",
+    },
+    maxLength: {
+      value: 20,
+      message: "Login must be at most 20 characters long",
+    },
+    required: { value: true, message: "Login is required" },
+    pattern: {
+      value: /^[w_]*$/,
+      message: "Login can only contain letters, numbers, and underscores",
+    },
   };
 
-  const incrementStateCounter = () => {
-    setStateCounter(stateCounter + 1);
-    console.log("stateCounter = ", stateCounter + 1);
+  const loginError = errors.login?.message;
+
+  const onSubmit = (data) => {
+    console.log("Form submitted with data:", data);
   };
 
   return (
     <div className="App">
-      <p>refCounter: {refCounter.current}</p>
-      <button onClick={incrementRefCounter}>Прибавить refCounter</button>
-
-      <p>stateCounter: {stateCounter}</p>
-      <button onClick={incrementStateCounter}>Прибавить stateCounter</button>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {loginError && <div className="error-text">{loginError}</div>}
+        <input name="login" type="text" {...register("login", loginProps)} />
+        <button type="submit" disabled={!!loginError}>
+          Send
+        </button>
+      </form>
     </div>
   );
 }
