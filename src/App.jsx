@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./App.css";
 
 const loginChangeSchema = yup
@@ -16,26 +16,36 @@ const loginBlurSchema = yup
 
 const validateAndGetError = (value, schema) => {
   let errorMessage = null;
+
   try {
     schema.validateSync(value, { abortEarly: false });
   } catch ({ errors }) {
     errorMessage = errors.join("\n");
   }
+
   return errorMessage;
 };
 
 function App() {
   const [login, setLogin] = useState("");
   const [loginError, setLoginError] = useState(null);
+
+  const submitButtonRef = useRef(null);
+
   const onLoginChange = ({ target }) => {
     setLogin(target.value);
     let error = validateAndGetError(target.value, loginChangeSchema);
     setLoginError(error);
+    if (target.value.length === 20) {
+      submitButtonRef.current.focus();
+    }
   };
+
   const onLoginBlur = () => {
     let error = validateAndGetError(login, loginBlurSchema);
     setLoginError(error);
   };
+
   const onSubmit = (event) => {
     event.preventDefault();
     console.log("Submitted login:", login);
@@ -61,7 +71,7 @@ function App() {
           onChange={onLoginChange}
           onBlur={onLoginBlur}
         />
-        <button type="submit" disabled={!!loginError}>
+        <button ref={submitButtonRef} type="submit" disabled={!!loginError}>
           Submit
         </button>
       </form>
