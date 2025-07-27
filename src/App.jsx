@@ -17,9 +17,9 @@ const loginBlurSchema = yup
 const validateAndGetError = (value, schema) => {
   let errorMessage = null;
   try {
-    schema.validateSync(value);
+    schema.validateSync(value, { abortEarly: false });
   } catch ({ errors }) {
-    errorMessage = errors[0];
+    errorMessage = errors.join("\n");
   }
   return errorMessage;
 };
@@ -44,7 +44,15 @@ function App() {
   return (
     <div className="App">
       <form onSubmit={onSubmit}>
-        <div className="error-text">{loginError}</div>
+        <div className="error-text">
+          {loginError &&
+            loginError.split("\n").map((line, index) => (
+              <span key={index}>
+                {line}
+                <br />
+              </span>
+            ))}
+        </div>
         <input
           type="text"
           name="login"
