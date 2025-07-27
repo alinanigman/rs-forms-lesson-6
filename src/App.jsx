@@ -1,8 +1,5 @@
-import * as yup from "yup";
 import { useState, useRef } from "react";
 import "./App.css";
-
-
 
 function App() {
   const [stateCounter, setStateCounter] = useState(0);
